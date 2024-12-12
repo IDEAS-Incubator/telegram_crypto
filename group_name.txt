@@ -1,3 +1,8 @@
-bitcoin
-godechain
-solana
+QCPbroadcast
+telonews
+Odaily_News
+TechFlowDaily
+foresightnews
+the_block_crypto
+theblockbeats
+toncoin_cn

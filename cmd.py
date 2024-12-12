@@ -119,6 +119,10 @@ async def download_chat_messages(username, from_date=None, to_date=None):
 
 async def process_chats(file_path, from_date=None, to_date=None):
     """Process a file containing usernames, download messages, and upload to S3."""
+    # Ensure the data directory exists
+    data_folder = "data"
+    os.makedirs(data_folder, exist_ok=True)
+
     with open(file_path, 'r') as file:
         usernames = [line.strip() for line in file.readlines()]
 
@@ -126,11 +130,11 @@ async def process_chats(file_path, from_date=None, to_date=None):
     for username in usernames:
         try:
             messages = await download_chat_messages(username, from_date, to_date)
-            filename = f"telegram_{username}_{datetime.now().strftime('%Y_%m_%d')}.json"
+            filename = os.path.join(data_folder, f"telegram_{username}_{datetime.now().strftime('%Y_%m_%d')}.json")
             with open(filename, 'w') as f:
                 json.dump(messages, f, indent=4)
 
-            s3_url = await upload_file_to_s3(S3_BUCKET_NAME, filename, filename)
+            s3_url = await upload_file_to_s3(S3_BUCKET_NAME, filename, os.path.basename(filename))
             logger.info(f"Messages for '{username}' uploaded to S3: {s3_url}")
         except Exception as e:
             logger.error(f"Failed to process '{username}': {e}")
